@@ -1,0 +1,43 @@
+name: PHP CI/CD with SonarCloud
+
+on:
+  push:
+    branches: [ prod ]  # or dev or any branch you want
+
+jobs:
+  scan-and-deploy:
+    runs-on: ubuntu-latest
+    env:
+      VERSION_TAG: v1.0.${{ github.run_number }}
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: SonarCloud Scan
+        uses: SonarSource/sonarcloud-github-action@v2
+        with:
+          args: >
+            -Dsonar.projectKey=sourabhtailor_prodbranch
+            -Dsonar.organization=sourabhtailor
+            -Dsonar.sources=.
+            -Dsonar.exclusions=vendor/**,tests/**,.github/**
+            -Dsonar.projectVersion=${{ env.VERSION_TAG }}
+            -Dsonar.qualitygate.wait=true
+
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+
+      - name: Set up SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.PRIVATE_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan 101.53.150.196 >> ~/.ssh/known_hosts
+
+      - name: Deploy to Server
+        if: success()
+        run: |
+          echo "Deploying version $VERSION_TAG on remote server..."
+          ssh root@103.53.150.196 "bash /var/www/prod.sh"
