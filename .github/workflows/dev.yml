@@ -37,7 +37,7 @@ jobs:
           ssh-keyscan 101.53.150.196 >> ~/.ssh/known_hosts
 
       - name: Deploy to Server
-        if: success()
+        if: success() && github.event_name == 'push' && github.ref == 'refs/heads/dev'
         run: |
           echo "Deploying version $VERSION_TAG on remote server..."
           ssh root@101.53.150.196 "bash /var/www/deploy.sh"
