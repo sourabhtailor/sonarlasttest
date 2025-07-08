@@ -40,4 +40,4 @@ jobs:
         if: success()
         run: |
           echo "Deploying version $VERSION_TAG on remote server..."
-          ssh root@103.53.150.196 "bash /var/www/prod.sh"
+          ssh root@101.53.150.196 "bash /var/www/prod.sh"
