@@ -1,5 +1,4 @@
 <?php
-  //today date
   $today_date =  date("Y/n/j/"); 
   session_start();
   include './includes/config.php';
