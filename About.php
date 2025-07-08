@@ -130,7 +130,6 @@ align-items:center;
 </head>
 <body>
 
-    <?php include_once './includes/navbar.php'?>
 <div class="about-section">
   <h1>About Us </h1>
   <p>Book Zone provides easy interface to its customer for purchasing books online.</p>
