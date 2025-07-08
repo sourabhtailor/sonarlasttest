@@ -1,6 +1,5 @@
 <?php
 
-require_once __DIR__ . '/../src/Calculator.php';
 
 $calc = new Calculator();
 
