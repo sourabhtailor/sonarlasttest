@@ -23,7 +23,6 @@ jobs:
             -Dsonar.exclusions=vendor/**,tests/**,.github/**
             -Dsonar.projectVersion=${{ env.VERSION_TAG }}
             -Dsonar.qualitygate.wait=true
-
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
