@@ -1,22 +1,10 @@
 <?php
-// Define a function to greet the user
-function greet($name) {
-    return "Hello, " . htmlspecialchars($name) . "!";
-}
 
-// Set a variable
-$user = "World";
+require_once __DIR__ . '/../src/Calculator.php';
 
-// Output HTML with PHP embedded
-?>
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8" />
-    <title>Sample PHP</title>
-</head>
-<body>
-    <h1><?php echo greet($user); ?></h1>
-</body>
-</html>
+$calc = new Calculator();
 
+echo "5 + 3 = " . $calc->add(5, 3) . PHP_EOL;
+echo "5 - 3 = " . $calc->subtract(5, 3) . PHP_EOL;
+echo "5 * 3 = " . $calc->multiply(5, 3) . PHP_EOL;
+echo "5 / 3 = " . $calc->divide(5, 3) . PHP_EOL;
