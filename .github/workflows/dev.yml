@@ -3,43 +3,44 @@ name: PHP CI/CD with SonarCloud
 on:
   push:
     branches: [ dev ]  # or dev or any branch you want
-  pull_request: 
-    branches: [ dev ]
 
 jobs:
   scan-and-deploy:
     runs-on: ubuntu-latest
     env:
       VERSION_TAG: v1.0.${{ github.run_number }}
+      SERVERS: |
+        root@101.53.150.196
+        USER2@SERVER_IP2
+        USER3@SERVER_IP3
 
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
+
       - name: SonarCloud Scan
         uses: SonarSource/sonarcloud-github-action@v2
         with:
           args: >
-            -Dsonar.projectKey=sourabhtailor_devbranch
+            -Dsonar.projectKey=sourabhtailor_multiserver
             -Dsonar.organization=sourabhtailor
             -Dsonar.sources=.
             -Dsonar.exclusions=vendor/**,tests/**,.github/**
             -Dsonar.projectVersion=${{ env.VERSION_TAG }}
             -Dsonar.qualitygate.wait=true
-            
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
-      - name: Set up SSH
-        run: |
-          mkdir -p ~/.ssh
-          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
-          chmod 600 ~/.ssh/id_rsa
-          ssh-keyscan 101.53.150.196 >> ~/.ssh/known_hosts
+      - name: Install sshpass
+        run: sudo apt-get install -y sshpass
 
-      - name: Deploy to Server
-        if: success() && github.event_name == 'push' && github.ref == 'refs/heads/dev'
+      - name: Deploy to Multiple Servers
+        if: success()
+        env:
+          PASSWORD: ${{ secrets.SERVER_PASSWORD }}
         run: |
-          echo "Deploying version $VERSION_TAG on remote server..."
-          ssh root@101.53.150.196 "bash /var/www/deploy.sh"
+          for SERVER in $SERVERS; do
+            HOST=$(echo $SERVER | cut -d'@' -f2)
+            echo "Deploying version $VERSION_TAG to $SERVER..."
+            sshpass -p "$PASSWORD" ssh -o StrictHostKeyChecking=no $SERVER "bash /var/www/prod.sh"
+          done
