@@ -1,43 +1,35 @@
-name: PHP CI/CD with SonarCloud
+name: Parallel CI/CD Deployment
 
 on:
   push:
     branches: [ dev ]
 
 jobs:
-  scan-and-deploy:
+  deploy:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        server: 
+          - sourabh1@101.53.150.196
+          - sourabh@101.53.150.196
+
     env:
       VERSION_TAG: v1.0.${{ github.run_number }}
-      SERVERS: |
-        root@101.53.150.196
 
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      - name: SonarCloud Scan
-        uses: SonarSource/sonarcloud-github-action@v2
-        with:
-          args: >
-            -Dsonar.projectKey=sourabhtailor_multiserver
-            -Dsonar.organization=sourabhtailor
-            -Dsonar.sources=.
-            -Dsonar.exclusions=vendor/**,tests/**,.github/**
-            -Dsonar.projectVersion=${{ env.VERSION_TAG }}
-            -Dsonar.qualitygate.wait=true
-        env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-
-      - name: Install sshpass
-        run: sudo apt-get install -y sshpass
-
-      - name: Deploy to Multiple Servers
-        if: success()
-        env:
-          PASSWORD: ${{ secrets.SERVER_PASSWORD }}
+      - name: Set up SSH Key
         run: |
-          for SERVER in $SERVERS; do
-            echo "Deploying version $VERSION_TAG to $SERVER..."
-            sshpass -p "$PASSWORD" ssh -o StrictHostKeyChecking=no $SERVER "bash /var/www/prod.sh"
-          done
+          mkdir -p ~/.ssh
+          echo "${{ secrets.PRIVATE_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+
+          HOST=$(echo "${{ matrix.server }}" | cut -d'@' -f2)
+          ssh-keyscan -H $HOST >> ~/.ssh/known_hosts
+
+      - name: Deploy to ${{ matrix.server }}
+        run: |
+          echo "Deploying version $VERSION_TAG to ${{ matrix.server }}..."
+          ssh ${{ matrix.server }} "bash /home/sourabh/prod.sh"
