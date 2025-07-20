@@ -10,8 +10,8 @@ jobs:
     env:
       VERSION_TAG: v1.0.${{ github.run_number }}
       SERVERS: |
-        sourabh@101.53.150.196
         sourabh1@101.53.150.196
+        sourabh@101.53.150.196
 
     steps:
       - name: Checkout Code
