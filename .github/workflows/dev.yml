@@ -2,7 +2,7 @@ name: PHP CI/CD with SonarCloud
 
 on:
   push:
-    branches: [ dev ]  # or dev or any branch you want
+    branches: [ dev ]
 
 jobs:
   scan-and-deploy:
@@ -38,7 +38,6 @@ jobs:
           PASSWORD: ${{ secrets.SERVER_PASSWORD }}
         run: |
           for SERVER in $SERVERS; do
-            HOST=$(echo $SERVER | cut -d'@' -f2)
             echo "Deploying version $VERSION_TAG to $SERVER..."
             sshpass -p "$PASSWORD" ssh -o StrictHostKeyChecking=no $SERVER "bash /var/www/prod.sh"
           done
