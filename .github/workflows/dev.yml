@@ -41,7 +41,7 @@ jobs:
       matrix:
         server:
           - sourabh@101.53.150.196
-          - sourabh2@192.168.1.102
+          - sourabh1@101.53.150.196
 
     steps:
       - name: Set up SSH key
