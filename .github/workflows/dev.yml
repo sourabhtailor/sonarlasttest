@@ -1,23 +1,21 @@
-name: PHP CI/CD with SonarCloud and Parallel Deployment
+name: PHP CI/CD with SonarCloud
 
 on:
   push:
-    branches: [ dev ]  # Change to your branch name
+    branches: [ dev ]  # change as needed
 
 jobs:
-  sonarcloud:
-    name: SonarCloud Scan
+  scan-and-deploy:
     runs-on: ubuntu-latest
-    outputs:
-      version_tag: ${{ steps.set-version.outputs.version_tag }}
+    env:
+      VERSION_TAG: v1.0.${{ github.run_number }}
+      SERVERS: |
+        sourabh@101.53.150.196
+        sourabh1@101.53.150.196
 
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
-
-      - name: Set Version Tag
-        id: set-version
-        run: echo "version_tag=v1.0.${{ github.run_number }}" >> "$GITHUB_OUTPUT"
 
       - name: SonarCloud Scan
         uses: SonarSource/sonarcloud-github-action@v2
@@ -27,35 +25,27 @@ jobs:
             -Dsonar.organization=sourabhtailor
             -Dsonar.sources=.
             -Dsonar.exclusions=vendor/**,tests/**,.github/**
-            -Dsonar.projectVersion=v1.0.${{ github.run_number }}
+            -Dsonar.projectVersion=${{ env.VERSION_TAG }}
             -Dsonar.qualitygate.wait=true
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
-  deploy:
-    name: Deploy to ${{ matrix.server }}
-    needs: sonarcloud
-    runs-on: ubuntu-latest
-
-    strategy:
-      matrix:
-        server:
-          - sourabh@101.53.150.196
-
-    steps:
-      - name: Set up SSH key
+      - name: Set up SSH Key
         run: |
           mkdir -p ~/.ssh
           echo "${{ secrets.PRIVATE_KEY }}" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
-          ls ~/.ssh/
 
-          HOST=$(echo "${{ matrix.server }}" | cut -d'@' -f2)
-          ssh-keyscan -H "$HOST" >> ~/.ssh/known_hosts
+          # Add each server to known_hosts
+          for SERVER in $SERVERS; do
+            HOST=$(echo $SERVER | cut -d'@' -f2)
+            ssh-keyscan -H $HOST >> ~/.ssh/known_hosts
+          done
 
-      - name: Deploy to ${{ matrix.server }}
-        env:
-          VERSION_TAG: ${{ needs.sonarcloud.outputs.version_tag }}
+      - name: Deploy to Multiple Servers
+        if: success()
         run: |
-          echo "Deploying version $VERSION_TAG to ${{ matrix.server }}..."
-          ssh ${{ matrix.server }} "bash /home/sourabh/deploy.sh"
+          for SERVER in $SERVERS; do
+            echo "Deploying version $VERSION_TAG to $SERVER..."
+            ssh $SERVER "bash /var/www/prod.sh"
+          done
