@@ -11,8 +11,6 @@ jobs:
       VERSION_TAG: v1.0.${{ github.run_number }}
       SERVERS: |
         root@101.53.150.196
-        USER2@SERVER_IP2
-        USER3@SERVER_IP3
 
     steps:
       - name: Checkout Code
