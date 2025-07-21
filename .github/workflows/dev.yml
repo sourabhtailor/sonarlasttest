@@ -39,9 +39,11 @@ jobs:
 
     strategy:
       matrix:
-        server:
-          - sourabh1@101.53.150.196
-          - sourabh2@101.53.150.196
+        include:
+          - user: sourabh1
+            host: 101.53.150.196
+          - user: sourabh2
+            host: 192.168.1.0
 
     steps:
       - name: Set up SSH key
@@ -49,13 +51,11 @@ jobs:
           mkdir -p ~/.ssh
           echo "${{ secrets.PRIVATE_KEY }}" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan -H "${{ matrix.host }}" >> ~/.ssh/known_hosts
 
-          HOST=$(echo "${{ matrix.server }}" | cut -d'@' -f2)
-          ssh-keyscan -H "$HOST" >> ~/.ssh/known_hosts
-
-      - name: Deploy to ${{ matrix.server }}
+      - name: Deploy to ${{ matrix.user }}@${{ matrix.host }}
         env:
-          VERSION_TAG: ${{ needs.sonarcloud.outputs.version_tag }}
+          VERSION_TAG: ${{ needs.sonarcloud.outputs.version_tag || 'latest' }}
         run: |
-          echo "Deploying version $VERSION_TAG to ${{ matrix.server }}..."
-          ssh ${{ matrix.server }} "bash /home/sourabh1/deploy.sh"
+          echo "Deploying version $VERSION_TAG to ${{ matrix.user }}@${{ matrix.host }}..."
+          ssh ${{ matrix.user }}@${{ matrix.host }} "bash /home/${{ matrix.user }}/deploy.sh"
