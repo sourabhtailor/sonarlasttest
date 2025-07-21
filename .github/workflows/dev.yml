@@ -58,4 +58,4 @@ jobs:
           VERSION_TAG: ${{ needs.sonarcloud.outputs.version_tag }}
         run: |
           echo "Deploying version $VERSION_TAG to ${{ matrix.server }}..."
-          ssh ${{ matrix.server }} "bash /var/www/prod.sh"
+          ssh ${{ matrix.server }} "bash /home/sourabh1/deploy.sh"
