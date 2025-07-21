@@ -43,13 +43,13 @@ jobs:
           - user: sourabh1
             host: 101.53.150.196
           - user: sourabh2
-            host: 192.168.1.0
+            host: 101.53.150.196
 
     steps:
       - name: Set up SSH key
         run: |
           mkdir -p ~/.ssh
-          echo "${{ secrets.PRIVATE_KEY }}" > ~/.ssh/id_rsa
+          echo "${{ secrets.PRIVATE_KEY }}" > ~/.ssh/id_rsa   
           chmod 600 ~/.ssh/id_rsa
           ssh-keyscan -H "${{ matrix.host }}" >> ~/.ssh/known_hosts
 
