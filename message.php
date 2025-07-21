@@ -57,7 +57,7 @@ while($row = $result->fetch_assoc()) {
         )";
             $conn->query($sql2);
 }
-//after cart order sent || deleting cart items from db
+//after cart order sent done || deleting cart items from db
 $sql3 = "DELETE FROM carts";
 $conn->query($sql3);
         }
