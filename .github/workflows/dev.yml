@@ -53,6 +53,6 @@ jobs:
           --document-name "AWS-RunShellScript" \
           --targets '[{"Key":"InstanceIds","Values":["i-07046ffd6b5f54c52"]}]' \
           --comment "Run deployment script via GitHub Actions" \
-          --parameters 'commands=["bash /home/ssm-user/script.sh"]' \
+          --parameters 'commands=["sudo bash /var/www/script.sh"]' \
           --region ap-south-1 \
           --output text
