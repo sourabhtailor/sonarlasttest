@@ -51,7 +51,7 @@ jobs:
         - name: Send command to EC2
           id: send_ssm
           run: |
-            INSTANCE_ID="i-07046ffd6b5f54c52"
+            INSTANCE_ID="i-0383df6506892c029"
             COMMAND="sudo bash /home/ssm-user/script.sh"
     
             echo "Sending SSM command..."
