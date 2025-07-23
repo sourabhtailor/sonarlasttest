@@ -52,7 +52,7 @@ jobs:
           id: send_ssm
           run: |
             INSTANCE_ID="i-07046ffd6b5f54c52"
-            COMMAND="sudo cat /var/www/html/index.html"
+            COMMAND="sudo bash /var/www/script.sh"
     
             echo "Sending SSM command..."
             COMMAND_ID=$(aws ssm send-command \
