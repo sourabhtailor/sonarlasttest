@@ -51,7 +51,7 @@ jobs:
       run: |
         aws ssm send-command \
           --document-name "AWS-RunShellScript" \
-          --targets '[{"Key":"InstanceIds","Values":["i-0383df6506892c029","i-07046ffd6b5f54c52"]}]' \
+          --targets '[{"Key":"InstanceIds","Values":["i-07046ffd6b5f54c52"]}]' \
           --comment "Run deployment script via GitHub Actions" \
           --parameters 'commands=["bash /home/ssm-user/script.sh"]' \
           --region ap-south-1 \
