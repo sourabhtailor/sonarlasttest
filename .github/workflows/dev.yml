@@ -49,7 +49,7 @@ jobs:
         
       - name: Run command on multiple EC2s
         run: |
-          INSTANCE_IDS="i-0383df6506892c029"
+          INSTANCE_IDS="i-07046ffd6b5f54c52"
           COMMAND="cat /var/www/html/index.html"
       
           aws ssm send-command \
