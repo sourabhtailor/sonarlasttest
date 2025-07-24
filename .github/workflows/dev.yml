@@ -53,6 +53,6 @@ jobs:
           --document-name "AWS-RunShellScript" \
           --targets '[{"Key":"tag:Name","Values":["my_private_instance"]}]' \
           --comment "Run deployment script via GitHub Actions" \
-          --parameters 'commands=["sudo bash /var/www/script.sh"]' \
+          --parameters 'commands=["sudo -u jenkins bash /var/www/script.sh"]' \
           --region ap-south-1 \
           --output text
