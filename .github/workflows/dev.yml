@@ -5,11 +5,11 @@ on:
     branches: [ dev ]  # Change to your branch name
 
 jobs:
-  sonarcloud:
-    name: SonarCloud Scan
-    runs-on: ubuntu-latest
-    outputs:
-      version_tag: ${{ steps.set-version.outputs.version_tag }}
+  # sonarcloud:
+  #   name: SonarCloud Scan
+  #   runs-on: ubuntu-latest
+  #   outputs:
+  #     version_tag: ${{ steps.set-version.outputs.version_tag }}
 
     # steps:
       # - name: Checkout Code
