@@ -50,10 +50,16 @@ jobs:
 
     - name: Run script on EC2 using SSM
       run: |
-        aws ssm send-command \
+        command_id=$(aws ssm send-command \
           --document-name "AWS-RunShellScript" \
           --targets '[{"Key":"tag:dev","Values":["deployment"]}]' \
           --comment "Run deployment script via GitHub Actions" \
           --parameters 'commands=["sudo -u jenkins bash /var/www/deploy.sh"]' \
           --region ap-south-1 \
-          --output text
+          --query "Command.CommandId" \
+          --output text)
+    
+        echo "Waiting for command to finish..."
+        aws ssm wait command-executed --command-id "$command_id" --region ap-south-1
+        aws ssm list-command-invocations --command-id "$command_id" --region ap-south-1 --details
+    
