@@ -52,13 +52,13 @@ jobs:
       run: |
         set -e
 
-        # Get instance IDs by tag
+        # Get instance IDs by tag and state
         instance_ids=$(aws ec2 describe-instances \
           --filters "Name=tag:dev,Values=deployment" "Name=instance-state-name,Values=running,pending" \
           --query "Reservations[].Instances[].InstanceId" \
           --region ap-south-1 --output text)
-
-        # Send the SSM command
+        
+        # Send the SSM command by tag
         command_id=$(aws ssm send-command \
           --document-name "AWS-RunShellScript" \
           --targets '[{"Key":"tag:dev","Values":["deployment"]}]' \
@@ -66,52 +66,33 @@ jobs:
           --region ap-south-1 \
           --query "Command.CommandId" \
           --output text)
-
-        echo "📨 Command sent. ID: $command_id"
-
+        
+        echo "Command sent with ID: $command_id"
+        
+        # Optional: wait a few seconds before checking
+        sleep 5
+        
+        # Wait for command execution and check status on each instance
         for id in $instance_ids; do
-          echo "🔍 Checking command invocation for instance $id..."
-
-          # Wait until the command invocation shows up
-          for attempt in {1..10}; do
-            invocation=$(aws ssm list-command-invocations \
-              --command-id "$command_id" \
-              --instance-id "$id" \
-              --region ap-south-1 \
-              --query "CommandInvocations" \
-              --output text)
-
-            if [[ -n "$invocation" && "$invocation" != "None" ]]; then
-              echo "✅ Invocation registered for instance $id"
-              break
-            else
-              echo "⏳ Waiting for invocation to register (attempt $attempt)..."
-              sleep 3
-            fi
-          done
-
-          echo "⏱️ Waiting for command to execute on instance $id..."
           aws ssm wait command-executed \
             --command-id "$command_id" \
             --instance-id "$id" \
             --region ap-south-1
-
-          # Check result
+        
           status=$(aws ssm list-command-invocations \
             --command-id "$command_id" \
             --instance-id "$id" \
             --query "CommandInvocations[0].Status" \
             --region ap-south-1 \
             --output text)
-
-          echo "📦 Instance $id: Command status is $status"
-
+        
+          echo "Instance $id: $status"
+        
           if [[ "$status" != "Success" ]]; then
             echo "❌ Command failed on $id"
             exit 1
           fi
         done
-
+        
         echo "✅ Command succeeded on all instances."
-
-
+        
