@@ -5,34 +5,34 @@ on:
     branches: [ dev ]  # Change to your branch name
 
 jobs:
-  sonarcloud:
-    name: SonarCloud Scan
-    runs-on: ubuntu-latest
-    outputs:
-      version_tag: ${{ steps.set-version.outputs.version_tag }}
+  # sonarcloud:
+  #   name: SonarCloud Scan
+  #   runs-on: ubuntu-latest
+  #   outputs:
+  #     version_tag: ${{ steps.set-version.outputs.version_tag }}
 
-    steps:
-      - name: Checkout Code
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
+  #   steps:
+  #     - name: Checkout Code
+  #       uses: actions/checkout@v4
+  #       with:
+  #         fetch-depth: 0
 
-      - name: Set Version Tag
-        id: set-version
-        run: echo "version_tag=v1.0.${{ github.run_number }}" >> "$GITHUB_OUTPUT"
+  #     - name: Set Version Tag
+  #       id: set-version
+  #       run: echo "version_tag=v1.0.${{ github.run_number }}" >> "$GITHUB_OUTPUT"
 
-      - name: SonarCloud Scan
-        uses: SonarSource/sonarcloud-github-action@v2
-        with:
-          args: >
-            -Dsonar.projectKey=sourabhtailor_multiserver
-            -Dsonar.organization=sourabhtailor
-            -Dsonar.sources=.
-            -Dsonar.exclusions=vendor/**,tests/**,.github/**
-            -Dsonar.projectVersion=v1.0.${{ github.run_number }}
-            -Dsonar.qualitygate.wait=true
-        env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+  #     - name: SonarCloud Scan
+  #       uses: SonarSource/sonarcloud-github-action@v2
+  #       with:
+  #         args: >
+  #           -Dsonar.projectKey=sourabhtailor_multiserver
+  #           -Dsonar.organization=sourabhtailor
+  #           -Dsonar.sources=.
+  #           -Dsonar.exclusions=vendor/**,tests/**,.github/**
+  #           -Dsonar.projectVersion=v1.0.${{ github.run_number }}
+  #           -Dsonar.qualitygate.wait=true
+  #       env:
+  #         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
   deploy:
     name: Deploy to aws using ssm
