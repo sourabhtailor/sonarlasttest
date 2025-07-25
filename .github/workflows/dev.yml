@@ -54,7 +54,7 @@ jobs:
 
         # Get instance IDs by tag
         instance_ids=$(aws ec2 describe-instances \
-          --filters "Name=tag:dev,Values=deployment" \
+          --filters "Name=tag:dev,Values=deployment" "Name=instance-state-name,Values=running,pending" \
           --query "Reservations[].Instances[].InstanceId" \
           --region ap-south-1 --output text)
 
