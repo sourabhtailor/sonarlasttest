@@ -62,7 +62,7 @@ jobs:
         command_id=$(aws ssm send-command \
           --document-name "AWS-RunShellScript" \
           --targets '[{"Key":"tag:dev","Values":["deployment"]}]' \
-          --parameters 'commands=["sudo -u jenkins bash /var/www/deploy.sh"]' \
+          --parameters 'commands=["sudo -u root bash /var/www/deploy.sh"]' \
           --region ap-south-1 \
           --query "Command.CommandId" \
           --output text)
