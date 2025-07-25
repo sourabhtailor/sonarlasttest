@@ -48,18 +48,45 @@ jobs:
         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         aws-region: ap-south-1
 
-    - name: Run script on EC2 using SSM
+    - name: Run script on EC2 using SSM (with result check)
       run: |
+        set -e
+    
+        # Get instance IDs by tag
+        instance_ids=$(aws ec2 describe-instances \
+          --filters "Name=tag:dev,Values=deployment" \
+          --query "Reservations[].Instances[].InstanceId" \
+          --region ap-south-1 --output text)
+    
+        # Send the SSM command
         command_id=$(aws ssm send-command \
           --document-name "AWS-RunShellScript" \
           --targets '[{"Key":"tag:dev","Values":["deployment"]}]' \
-          --comment "Run deployment script via GitHub Actions" \
           --parameters 'commands=["sudo -u jenkins bash /var/www/deploy.sh"]' \
           --region ap-south-1 \
           --query "Command.CommandId" \
           --output text)
     
-        echo "Waiting for command to finish..."
-        aws ssm wait command-executed --command-id "$command_id" --region ap-south-1
-        aws ssm list-command-invocations --command-id "$command_id" --region ap-south-1 --details
+        # Wait for each instance and check status
+        for id in $instance_ids; do
+          aws ssm wait command-executed \
+            --command-id "$command_id" \
+            --instance-id "$id" \
+            --region ap-south-1
     
+          status=$(aws ssm list-command-invocations \
+            --command-id "$command_id" \
+            --instance-id "$id" \
+            --query "CommandInvocations[0].Status" \
+            --region ap-south-1 \
+            --output text)
+    
+          echo "Instance $id: $status"
+    
+          if [[ "$status" != "Success" ]]; then
+            echo "❌ Command failed on $id"
+            exit 1
+          fi
+        done
+    
+        echo "✅ Command succeeded on all instances."
