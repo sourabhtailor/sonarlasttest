@@ -46,7 +46,7 @@ jobs:
       with:
         aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        aws-region: ap-south-1
+        aws-region: ap-northeast-1
 
     - name: Run script on EC2 using SSM (with result check)
       run: |
@@ -56,14 +56,14 @@ jobs:
         instance_ids=$(aws ec2 describe-instances \
           --filters "Name=tag:dev,Values=deployment" "Name=instance-state-name,Values=running,pending" \
           --query "Reservations[].Instances[].InstanceId" \
-          --region ap-south-1 --output text)
+          --region ap-northeast-1 --output text)
         
         # Send the SSM command by tag
         command_id=$(aws ssm send-command \
           --document-name "AWS-RunShellScript" \
           --targets '[{"Key":"tag:dev","Values":["deployment"]}]' \
           --parameters 'commands=["sudo -u root bash /var/www/deploy.sh"]' \
-          --region ap-south-1 \
+          --region ap-northeast-1 \
           --query "Command.CommandId" \
           --output text)
         
@@ -77,13 +77,13 @@ jobs:
           aws ssm wait command-executed \
             --command-id "$command_id" \
             --instance-id "$id" \
-            --region ap-south-1
+            --region ap-northeast-1
         
           status=$(aws ssm list-command-invocations \
             --command-id "$command_id" \
             --instance-id "$id" \
             --query "CommandInvocations[0].Status" \
-            --region ap-south-1 \
+            --region ap-northeast-1 \
             --output text)
         
           echo "Instance $id: $status"
