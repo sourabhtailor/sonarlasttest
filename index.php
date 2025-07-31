@@ -79,11 +79,11 @@ while($row = $result->fetch_assoc()) {
     <div class="section-4">
         <h2 style="">Featured Brands</h2>
      <div class="brand-container">
-            <img class='brand' src="./images/book_logo1.png" alt="">
-            <img class='brand' src="./images/book_logo_6.png" alt="">
-            <img class='brand' src="./images/book_logo3.png" alt="">
-            <img class='brand' src="./images/book_logo_4.png" alt="">
-            <img class='brand' src="./images/book_logo_5.png" alt="">
+           # <img class='brand' src="./images/book_logo1.png" alt="">
+           # <img class='brand' src="./images/book_logo_6.png" alt="">
+           # <img class='brand' src="./images/book_logo3.png" alt="">
+           # <img class='brand' src="./images/book_logo_4.png" alt="">
+           # <img class='brand' src="./images/book_logo_5.png" alt="">
      </div>
     </div>
 
