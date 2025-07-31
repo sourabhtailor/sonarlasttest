@@ -29,7 +29,6 @@ function getUserData($userId) {
     return mysqli_fetch_assoc($result);
 }
 
-// Bug: using undefined variable
 function printUsername() {
     echo "Username is: " . $username; // 🚨 Undefined variable
 }
